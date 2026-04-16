@@ -427,8 +427,8 @@ async function sendToNotion(){
   tableRows.push({object:'block',type:'table_row',table_row:{cells:[[{type:'text',text:{content:'카테고리'},annotations:{bold:true}}],[{type:'text',text:{content:'금액'},annotations:{bold:true}}],[{type:'text',text:{content:'비율'},annotations:{bold:true}}]]}});
   sortedCat.forEach(([cat,val])=>{
     const pct=exp>0?Math.round(val/exp*100):0;
-    const bar='█'.repeat(Math.round(pct/5))+'░'.repeat(20-Math.round(pct/5));
-    tableRows.push({object:'block',type:'table_row',table_row:{cells:[[{type:'text',text:{content:cat}}],[{type:'text',text:{content:fmt(val)}}],[{type:'text',text:{content:`${pct}%  ${bar.slice(0,10)}`}}]}});
+    const filled=Math.round(pct/5);const bar='|'.repeat(filled)+'-'.repeat(Math.max(0,20-filled));
+    tableRows.push({object:'block',type:'table_row',table_row:{cells:[[{type:'text',text:{content:cat}}],[{type:'text',text:{content:fmt(val)}}],[{type:'text',text:{content:pct+'%  '+bar.slice(0,10)}}]}});
   });
   blocks.push({object:'block',type:'table',table:{table_width:3,has_column_header:true,has_row_header:false,children:tableRows}});
   blocks.push({object:'block',type:'divider',divider:{}});
