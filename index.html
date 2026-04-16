@@ -550,18 +550,19 @@ function sendToNotion() {
 
   // 카테고리별 지출
   blocks.push(makeHeading2("카테고리별 지출"));
-  var tableRows = [];
-  tableRows.push({object:"block",type:"table_row",table_row:{cells:[[makeText("카테고리",true)],[makeText("금액",true)],[makeText("비율",true)]]}});
-  sortedCat.forEach(function(pair) {
-    var cat=pair[0], val=pair[1];
-    var pct = exp > 0 ? Math.round(val/exp*100) : 0;
-    var barFilled = Math.round(pct/10);
-    var barStr = "";
-    for (var i=0; i<barFilled; i++) barStr += "|";
-    for (var i=barFilled; i<10; i++) barStr += "-";
-    tableRows.push({object:"block",type:"table_row",table_row:{cells:[[makeText(cat)],[makeText(fmt(val))],[makeText(pct+"%  "+barStr)]]}});
-  });
-  blocks.push({object:"block",type:"table",table:{table_width:3,has_column_header:true,has_row_header:false,children:tableRows}});
+  if (sortedCat.length === 0) {
+    blocks.push(makeBullet("지출 내역 없음"));
+  } else {
+    sortedCat.forEach(function(pair) {
+      var cat=pair[0], val=pair[1];
+      var pct = exp > 0 ? Math.round(val/exp*100) : 0;
+      var barFilled = Math.round(pct/10);
+      var barStr = "";
+      for (var i=0; i<barFilled; i++) barStr += "|";
+      for (var i=barFilled; i<10; i++) barStr += "-";
+      blocks.push(makeBullet(cat+"  "+fmt(val)+"  ("+pct+"%  "+barStr+")"));
+    });
+  }
   blocks.push(makeDivider());
 
   // Top5
@@ -588,6 +589,13 @@ function sendToNotion() {
     });
     if (children.length === 0) children = [makeBullet("-")];
     blocks.push({object:"block",type:"toggle",toggle:{rich_text:[makeText(curMonth+"월 "+day+"일  |  "+summary, true)],children:children}});
+  });
+
+  // blocks 검증 - children 있는 블록은 비어있으면 안됨
+  blocks = blocks.filter(function(b) {
+    if (b.type === "toggle" && (!b.toggle.children || b.toggle.children.length === 0)) return false;
+    if (b.type === "table" && (!b.table.children || b.table.children.length === 0)) return false;
+    return true;
   });
 
   // 기존 블록 삭제 후 전송
@@ -617,6 +625,7 @@ function sendToNotion() {
         idx++;
         setTimeout(sendChunk, 300);
       }).catch(function(e) {
+        console.log("오류 발생 청크:", JSON.stringify(chunks[idx]));
         setLog("오류: "+e.message, "#EF4444");
         btn.disabled=false; btn.textContent="노션에 저장";
       });
