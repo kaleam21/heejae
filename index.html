@@ -533,7 +533,7 @@ function sendToNotion() {
   }
 
   function makeHeading2(text) { return {object:"block",type:"heading_2",heading_2:{rich_text:[makeText(text)]}}; }
-  function makeDivider() { return {object:"block",type:"divider",divider:{}}; }
+  function makeDivider() { return {object:"block",type:"paragraph",paragraph:{rich_text:[{type:"text",text:{content:"─────────────────────────"}}]}}; }
   function makeCallout(text, emoji, color) { return {object:"block",type:"callout",callout:{rich_text:[makeText(text)],icon:{emoji:emoji||"📌"},color:color||"blue_background"}}; }
   function makeBullet(text, bold) { return {object:"block",type:"bulleted_list_item",bulleted_list_item:{rich_text:[makeText(text,bold)]}}; }
 
@@ -545,7 +545,7 @@ function sendToNotion() {
 
   // 요약
   blocks.push(makeHeading2("이달 요약"));
-  blocks.push(makeCallout("지출  "+fmt(exp)+"   수입  "+fmt(inc)+"   순수입  "+(net>=0?"+":"")+fmt(net), "📊", "blue_background"));
+  blocks.push({object:"block",type:"callout",callout:{rich_text:[makeText("지출  "+fmt(exp)+"   수입  "+fmt(inc)+"   순수입  "+(net>=0?"+":"")+fmt(net))],icon:{type:"emoji",emoji:"💰"},color:"blue_background"}});
   blocks.push(makeDivider());
 
   // 카테고리별 지출
