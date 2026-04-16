@@ -583,12 +583,13 @@ function sendToNotion() {
     var summary = "";
     if (dayExp>0) summary += "지출 "+fmt(dayExp);
     if (dayInc>0) summary += (summary?" / ":"") + "수입 "+fmt(dayInc);
-    var children = dr.slice().sort(function(a,b){return b.amount-a.amount;}).map(function(r) {
+    // 토글 대신 heading3 + 불릿으로 구성 (API children 제한 우회)
+    blocks.push({object:"block",type:"heading_3",heading_3:{rich_text:[makeText(curMonth+"월 "+day+"일  |  "+summary, true)]}});
+    dr.slice().sort(function(a,b){return b.amount-a.amount;}).forEach(function(r) {
       var prefix = r.type==="수입" ? "[수입] " : "[지출] ";
-      return makeBullet(prefix+r.name+"  ["+r.cat+"]  "+(r.type==="수입"?"+":"-")+fmt(r.amount));
+      blocks.push(makeBullet(prefix+r.name+"  ["+r.cat+"]  "+(r.type==="수입"?"+":"-")+fmt(r.amount)));
     });
-    if (children.length === 0) children = [makeBullet("-")];
-    blocks.push({object:"block",type:"toggle",toggle:{rich_text:[makeText(curMonth+"월 "+day+"일  |  "+summary, true)],children:children}});
+    blocks.push({object:"block",type:"paragraph",paragraph:{rich_text:[]}});
   });
 
   // blocks 검증 - children 있는 블록은 비어있으면 안됨
