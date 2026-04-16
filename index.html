@@ -589,7 +589,7 @@ function sendToNotion() {
       var prefix = r.type==="수입" ? "[수입] " : "[지출] ";
       blocks.push(makeBullet(prefix+r.name+"  ["+r.cat+"]  "+(r.type==="수입"?"+":"-")+fmt(r.amount)));
     });
-    blocks.push({object:"block",type:"paragraph",paragraph:{rich_text:[]}});
+
   });
 
   // blocks 검증 - children 있는 블록은 비어있으면 안됨
@@ -613,7 +613,7 @@ function sendToNotion() {
   }).catch(function(){}).then(function() {
     setLog("블록 전송 중...");
     var chunks = [];
-    for (var i=0; i<blocks.length; i+=80) chunks.push(blocks.slice(i,i+80));
+    for (var i=0; i<blocks.length; i+=20) chunks.push(blocks.slice(i,i+20));
     var idx = 0;
     function sendChunk() {
       if (idx >= chunks.length) {
