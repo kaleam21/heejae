@@ -12,12 +12,15 @@ export default async function handler(req, res) {
 
   const notionUrl = `https://api.notion.com/v1/${Array.isArray(path) ? path.join('/') : path}`;
 
+  const rawToken = req.headers['authorization'] || '';
+  const token = rawToken.startsWith('Bearer ') ? rawToken : `Bearer ${rawToken}`;
+
   try {
     const fetchOptions = {
       method: req.method,
       headers: {
-        'Authorization': req.headers['authorization'],
-        'Notion-Version': req.headers['notion-version'] || '2022-06-28',
+        'Authorization': token,
+        'Notion-Version': '2022-06-28',
         'Content-Type': 'application/json',
       },
     };
