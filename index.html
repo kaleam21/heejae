@@ -249,7 +249,7 @@
 </div>
 <script>
 // ★ Vercel 배포 후 본인 URL로 교체하세요
-const PROXY_BASE = `${window.location.origin}/api/notion`;
+const PROXY_BASE = 'https://heejae-9znvd2kk9-hb999123-4653s-projects.vercel.app/api/notion';
 
 const NOTION_CATEGORIES = ['기타','의류비','저축과투자','경조사비','의료비','문화생활비','교통비','식비','구독료','보험료','통신비','주거비'];
 
@@ -445,6 +445,25 @@ function addLog(msg, type='muted') {
   box.scrollTop = box.scrollHeight;
 }
 
+const CAT_DB_ID = 'ab7978aeeb1982519cab01bb8142ab81';
+let catPageIdMap = {};
+
+async function loadCategoryIds(token) {
+  addLog('카테고리 DB 조회 중...', 'info');
+  try {
+    const res = await notionFetch(token, `databases/${CAT_DB_ID}/query`, 'POST', {});
+    for (const page of res.results || []) {
+      const props = page.properties || {};
+      const titleArr = props['이름']?.title || props['카테고리']?.title || props['Name']?.title || [];
+      const name = titleArr[0]?.plain_text || '';
+      if (name) catPageIdMap[name] = page.id;
+    }
+    addLog(`카테고리 ${Object.keys(catPageIdMap).length}개 로드 완료: ${Object.keys(catPageIdMap).join(', ')}`, 'ok');
+  } catch(e) {
+    addLog(`카테고리 로드 실패: ${e.message}`, 'err');
+  }
+}
+
 async function startUpload() {
   const token     = document.getElementById('notion-token').value.trim();
   const incomeDb  = document.getElementById('income-db-id').value.trim().replace(/-/g,'');
@@ -457,6 +476,8 @@ async function startUpload() {
   document.getElementById('step4').classList.remove('hidden');
   document.getElementById('step4').classList.add('active');
   document.getElementById('step4').scrollIntoView({behavior:'smooth', block:'start'});
+
+  await loadCategoryIds(token);
 
   const incomeRows  = parsedRows.filter(r=>r.kind==='income');
   const expenseRows = parsedRows.filter(r=>r.kind==='expense');
@@ -492,13 +513,15 @@ async function startUpload() {
 
   for (const r of expenseRows) {
     try {
+      const catPageId = catPageIdMap[r.cat];
+      const catProp = catPageId ? { '카테고리': { relation: [{ id: catPageId }] } } : {};
       await notionFetch(token, 'pages', 'POST', {
         parent: { database_id: expenseDb },
         properties: {
           '이름': { title: [{ text: { content: r.name } }] },
           '지출일': { date: { start: r.date } },
           '금액': { number: r.amount },
-          '카테고리': { select: { name: r.cat } },
+          ...catProp,
         }
       });
       done++;
