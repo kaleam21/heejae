@@ -36,442 +36,98 @@
     line-height: 1.6;
   }
 
-  .page-wrap {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 5rem;
-  }
+  .page-wrap { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
 
-  .header {
-    margin-bottom: 3rem;
-  }
+  .header { margin-bottom: 3rem; }
+  .header-badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 1rem; }
+  h1 { font-size: 28px; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+  .header-sub { font-size: 14px; color: var(--text2); }
 
-  .header-badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text3);
-    margin-bottom: 1rem;
-  }
+  .step { margin-bottom: 2rem; opacity: 0.35; transition: opacity 0.3s; pointer-events: none; }
+  .step.active { opacity: 1; pointer-events: all; }
+  .step.done { opacity: 0.6; pointer-events: all; }
 
-  h1 {
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
-  }
+  .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border2); background: var(--bg2); font-size: 12px; font-weight: 600; color: var(--text2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+  .step.active .step-num { border-color: var(--accent); color: var(--accent); background: rgba(255,255,255,0.05); }
+  .step.done .step-num { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .step-title { font-size: 15px; font-weight: 500; color: var(--text); }
 
-  .header-sub {
-    font-size: 14px;
-    color: var(--text2);
-  }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
 
-  .step {
-    margin-bottom: 2rem;
-    opacity: 0.35;
-    transition: opacity 0.3s;
-    pointer-events: none;
-  }
-
-  .step.active {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .step.done {
-    opacity: 0.6;
-    pointer-events: all;
-  }
-
-  .step-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 1rem;
-  }
-
-  .step-num {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 1px solid var(--border2);
-    background: var(--bg2);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.3s;
-  }
-
-  .step.active .step-num {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(255,255,255,0.05);
-  }
-
-  .step.done .step-num {
-    background: var(--green-bg);
-    border-color: var(--green);
-    color: var(--green);
-  }
-
-  .step-title {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-  }
-
-  /* Drop zone */
-  .drop-zone {
-    border: 1.5px dashed var(--border2);
-    border-radius: var(--radius);
-    padding: 2.5rem 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-  }
-
-  .drop-zone:hover, .drop-zone.drag-over {
-    border-color: rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.03);
-  }
-
+  .drop-zone { border: 1.5px dashed var(--border2); border-radius: var(--radius); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.03); }
   #file-input { display: none; }
+  .drop-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+  .drop-label { font-size: 14px; color: var(--text2); }
+  .drop-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
 
-  .drop-icon {
-    font-size: 32px;
-    margin-bottom: 12px;
-    display: block;
-  }
+  .file-loaded { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--green-bg); border: 1px solid rgba(74,222,128,0.2); border-radius: var(--radius-sm); font-size: 13px; color: var(--green); margin-top: 12px; }
 
-  .drop-label {
-    font-size: 14px;
-    color: var(--text2);
-  }
-
-  .drop-sub {
-    font-size: 12px;
-    color: var(--text3);
-    margin-top: 6px;
-  }
-
-  .file-loaded {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    background: var(--green-bg);
-    border: 1px solid rgba(74,222,128,0.2);
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    color: var(--green);
-    margin-top: 12px;
-  }
-
-  /* Stats */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 1.25rem;
-  }
-
-  .stat {
-    background: var(--bg3);
-    border-radius: var(--radius-sm);
-    padding: 1rem;
-    border: 1px solid var(--border);
-  }
-
-  .stat-label {
-    font-size: 11px;
-    color: var(--text3);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 500;
-  }
-
-  .stat-val {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text);
-  }
-
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .stat { background: var(--bg3); border-radius: var(--radius-sm); padding: 1rem; border: 1px solid var(--border); }
+  .stat-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+  .stat-val { font-size: 20px; font-weight: 600; color: var(--text); }
   .stat-val.green { color: var(--green); }
   .stat-val.red { color: var(--red); }
 
-  /* Tabs */
-  .tab-row {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1.25rem;
-  }
-
-  .tab {
-    padding: 8px 16px;
-    font-size: 13px;
-    cursor: pointer;
-    color: var(--text2);
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color 0.15s;
-  }
-
+  .tab-row { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 1.25rem; }
+  .tab { padding: 8px 16px; font-size: 13px; cursor: pointer; color: var(--text2); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s; }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
 
-  /* Table */
   .scroll-table { max-height: 280px; overflow-y: auto; }
-
-  .preview-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-  }
-
-  .preview-table th {
-    text-align: left;
-    padding: 7px 10px;
-    color: var(--text3);
-    border-bottom: 1px solid var(--border);
-    font-weight: 500;
-    white-space: nowrap;
-    position: sticky;
-    top: 0;
-    background: var(--bg2);
-  }
-
-  .preview-table td {
-    padding: 7px 10px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
-    vertical-align: middle;
-  }
-
+  .preview-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .preview-table th { text-align: left; padding: 7px 10px; color: var(--text3); border-bottom: 1px solid var(--border); font-weight: 500; white-space: nowrap; position: sticky; top: 0; background: var(--bg2); }
+  .preview-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
   .preview-table tr:last-child td { border-bottom: none; }
   .preview-table tr:hover td { background: var(--bg3); }
 
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-  }
-
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
   .badge-income { background: var(--green-bg); color: var(--green); }
   .badge-expense { background: var(--red-bg); color: var(--red); }
 
-  /* Mapping */
-  .map-item {
-    display: grid;
-    grid-template-columns: 1fr 24px 1fr;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 13px;
-  }
-
-  .map-from {
-    padding: 7px 12px;
-    background: var(--bg3);
-    border-radius: var(--radius-sm);
-    color: var(--text2);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
+  .map-item { display: grid; grid-template-columns: 1fr 24px 1fr; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 13px; }
+  .map-from { padding: 7px 12px; background: var(--bg3); border-radius: var(--radius-sm); color: var(--text2); border: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .map-arrow { color: var(--text3); text-align: center; font-size: 14px; }
-
-  .map-select {
-    width: 100%;
-    padding: 7px 10px;
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    font-size: 12px;
-    font-family: inherit;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-
+  .map-select { width: 100%; padding: 7px 10px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-size: 12px; font-family: inherit; cursor: pointer; appearance: none; -webkit-appearance: none; }
   .map-select:focus { outline: none; border-color: rgba(255,255,255,0.3); }
 
-  /* Fields */
   .field-group { margin-bottom: 1rem; }
-  .field-label {
-    font-size: 12px;
-    color: var(--text2);
-    font-weight: 500;
-    margin-bottom: 6px;
-    display: block;
-  }
-
-  .field-group input {
-    width: 100%;
-    padding: 10px 12px;
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    transition: border-color 0.15s;
-  }
-
-  .field-group input:focus {
-    outline: none;
-    border-color: rgba(255,255,255,0.3);
-  }
-
-  .field-hint {
-    font-size: 11px;
-    color: var(--text3);
-    margin-top: 5px;
-    line-height: 1.5;
-  }
-
+  .field-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 6px; display: block; }
+  .field-group input { width: 100%; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; font-family: 'SF Mono', 'Fira Code', monospace; transition: border-color 0.15s; }
+  .field-group input:focus { outline: none; border-color: rgba(255,255,255,0.3); }
+  .field-hint { font-size: 11px; color: var(--text3); margin-top: 5px; line-height: 1.5; }
   .field-hint a { color: var(--blue); text-decoration: none; }
-  .field-hint a:hover { text-decoration: underline; }
 
-  /* Buttons */
   .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.25rem; }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border2);
-    background: transparent;
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: inherit;
-    text-decoration: none;
-  }
-
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: transparent; color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: inherit; }
   .btn:hover { background: var(--bg3); border-color: rgba(255,255,255,0.2); }
   .btn:active { transform: scale(0.98); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .btn-primary {
-    background: var(--text);
-    color: var(--bg);
-    border-color: transparent;
-    font-weight: 600;
-  }
-
+  .btn-primary { background: var(--text); color: var(--bg); border-color: transparent; font-weight: 600; }
   .btn-primary:hover { background: #d0d0d0; }
 
-  /* Progress */
-  .progress-bar {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    margin: 1rem 0;
-    overflow: hidden;
-  }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin: 1rem 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
+  .progress-label { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
 
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.3s;
-  }
-
-  .progress-label {
-    font-size: 12px;
-    color: var(--text2);
-    margin-bottom: 10px;
-  }
-
-  /* Log */
-  .log-box {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 1rem;
-    font-size: 12px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    max-height: 200px;
-    overflow-y: auto;
-    line-height: 1.7;
-  }
-
+  .log-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; font-size: 12px; font-family: 'SF Mono', 'Fira Code', monospace; max-height: 200px; overflow-y: auto; line-height: 1.7; }
   .log-line { margin-bottom: 2px; }
   .log-ok { color: var(--green); }
   .log-err { color: var(--red); }
   .log-info { color: var(--blue); }
   .log-muted { color: var(--text3); }
 
-  /* Info box */
-  .info-box {
-    background: var(--blue-bg);
-    border: 1px solid rgba(96,165,250,0.2);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    font-size: 12px;
-    color: var(--blue);
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 1.5rem 0;
-  }
-
+  .info-box { background: var(--blue-bg); border: 1px solid rgba(96,165,250,0.2); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px; color: var(--blue); margin-bottom: 1rem; line-height: 1.6; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
   .hidden { display: none !important; }
-
-  .col-amount {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 12px;
-  }
-
+  .col-amount { text-align: right; font-variant-numeric: tabular-nums; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; }
   .text-muted { color: var(--text3); }
-
-  .success-banner {
-    background: var(--green-bg);
-    border: 1px solid rgba(74,222,128,0.25);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    color: var(--green);
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    margin-top: 1rem;
-  }
+  .success-banner { background: var(--green-bg); border: 1px solid rgba(74,222,128,0.25); border-radius: var(--radius-sm); padding: 14px 16px; color: var(--green); font-size: 14px; font-weight: 500; text-align: center; margin-top: 1rem; }
 
   @media (max-width: 480px) {
     .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .stats-row .stat:last-child { grid-column: 1 / -1; }
     h1 { font-size: 22px; }
   }
 </style>
@@ -513,48 +169,27 @@
     </div>
     <div class="card">
       <div class="stats-row">
-        <div class="stat">
-          <div class="stat-label">총 거래</div>
-          <div class="stat-val" id="stat-total">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">수입</div>
-          <div class="stat-val green" id="stat-income">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">지출</div>
-          <div class="stat-val red" id="stat-expense">—</div>
-        </div>
+        <div class="stat"><div class="stat-label">총 거래</div><div class="stat-val" id="stat-total">—</div></div>
+        <div class="stat"><div class="stat-label">수입</div><div class="stat-val green" id="stat-income">—</div></div>
+        <div class="stat"><div class="stat-label">지출</div><div class="stat-val red" id="stat-expense">—</div></div>
       </div>
-
       <div class="tab-row">
         <div class="tab active" id="tab-btn-preview" onclick="showTab('preview')">거래내역 미리보기</div>
         <div class="tab" id="tab-btn-mapping" onclick="showTab('mapping')">카테고리 매핑 수정</div>
       </div>
-
       <div id="tab-preview">
         <div class="scroll-table">
           <table class="preview-table">
-            <thead>
-              <tr>
-                <th>날짜</th>
-                <th>구분</th>
-                <th>거래처</th>
-                <th>금액</th>
-                <th>카테고리</th>
-              </tr>
-            </thead>
+            <thead><tr><th>날짜</th><th>구분</th><th>거래처</th><th>금액</th><th>카테고리</th></tr></thead>
             <tbody id="preview-body"></tbody>
           </table>
         </div>
         <div style="font-size:11px;color:var(--text3);margin-top:8px;">내계좌이체 및 카드대금은 자산변동 없음으로 자동 제외됩니다</div>
       </div>
-
       <div id="tab-mapping" class="hidden">
         <div class="info-box">뱅크샐러드 카테고리를 노션 가계부 카테고리로 매핑해요. 변경하고 싶은 항목을 수정하세요.</div>
         <div id="map-list"></div>
       </div>
-
       <div class="btn-row">
         <button class="btn btn-primary" onclick="activateStep3()">다음 단계 →</button>
       </div>
@@ -572,29 +207,21 @@
         입력한 정보는 브라우저에서만 사용되며 어디에도 저장되지 않아요.<br>
         노션 Integration 만들기: <a href="https://www.notion.so/my-integrations" target="_blank">notion.so/my-integrations</a>
       </div>
-
       <div class="field-group">
         <label class="field-label">노션 Integration Token</label>
         <input type="password" id="notion-token" placeholder="secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
         <div class="field-hint">노션 → 설정 → 연결 → Integration 만들기 → 토큰 복사</div>
       </div>
-
       <hr class="divider" />
-
       <div class="field-group">
         <label class="field-label">수입 DB ID</label>
         <input type="text" id="income-db-id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
       </div>
-
       <div class="field-group">
         <label class="field-label">지출(변동비) DB ID</label>
         <input type="text" id="expense-db-id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
-        <div class="field-hint">
-          DB ID 찾는 방법: 노션에서 DB 페이지 열기 → 우측 상단 ··· → 링크 복사<br>
-          URL 형태: notion.so/<b>32자리ID</b>?v=... → 32자리 부분이 DB ID
-        </div>
+        <div class="field-hint">DB URL에서 notion.so/ 뒤 32자리</div>
       </div>
-
       <div class="btn-row">
         <button class="btn" onclick="testConnection()">연결 테스트</button>
         <button class="btn btn-primary" id="upload-btn" onclick="startUpload()">노션에 업로드 →</button>
@@ -610,13 +237,9 @@
     </div>
     <div class="card">
       <div class="progress-label" id="progress-text">준비 중...</div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
       <div class="log-box" id="log-box"></div>
-      <div id="success-banner" class="success-banner hidden">
-        🎉 업로드 완료! 노션 가계부를 확인해보세요.
-      </div>
+      <div id="success-banner" class="success-banner hidden">🎉 업로드 완료! 노션 가계부를 확인해보세요.</div>
       <div class="btn-row hidden" id="done-row">
         <button class="btn btn-primary" onclick="location.reload()">새 파일 업로드</button>
       </div>
@@ -624,8 +247,10 @@
   </div>
 
 </div>
-
 <script>
+// ★ Vercel 배포 후 본인 URL로 교체하세요
+const PROXY_BASE = 'https://heejae-9znvd2kk9-hb999123-4653s-projects.vercel.app/api/notion';
+
 const NOTION_CATEGORIES = ['기타','의류비','저축과투자','경조사비','의료비','문화생활비','교통비','식비','구독료','보험료','통신비','주거비'];
 
 const DEFAULT_MAP = {
@@ -650,10 +275,7 @@ let uniqueBankCats = new Set();
 function xlsxDateToStr(v) {
   if (typeof v === 'number') {
     const d = new Date((v - 25569) * 86400 * 1000);
-    const y = d.getUTCFullYear();
-    const m = String(d.getUTCMonth()+1).padStart(2,'0');
-    const dd = String(d.getUTCDate()).padStart(2,'0');
-    return `${y}-${m}-${dd}`;
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
   }
   return String(v||'').substring(0,10);
 }
@@ -667,15 +289,12 @@ function shouldSkip(r) {
 }
 
 function resolveCategory(mainCat, subCat) {
-  const s = (subCat||'').trim();
-  const m = (mainCat||'').trim();
-  return userMap[s] || userMap[m] || '기타';
+  return userMap[(subCat||'').trim()] || userMap[(mainCat||'').trim()] || '기타';
 }
 
 function parseXlsx(data) {
   const wb = XLSX.read(data, {type:'array'});
   let txSheet = null;
-
   for (const name of wb.SheetNames) {
     if (name.includes('거래') || name.includes('내역')) { txSheet = wb.Sheets[name]; break; }
   }
@@ -689,21 +308,17 @@ function parseXlsx(data) {
 
   const rows = XLSX.utils.sheet_to_json(txSheet, {header:1, defval:''});
   const result = [];
-
   for (const r of rows) {
     if (!r[0] || isNaN(Number(r[0]))) continue;
     if (shouldSkip(r)) continue;
-
-    const type    = (r[2]||'').toString().trim();
+    const type = (r[2]||'').toString().trim();
     const mainCat = (r[3]||'').toString().trim();
     const subCat  = (r[4]||'').toString().trim();
     const name    = (r[5]||'').toString().trim();
     const amount  = Number(r[6]||0);
     const account = (r[8]||'').toString().trim();
     const date    = xlsxDateToStr(r[0]);
-
     if (!name || amount === 0) continue;
-
     if (type === '수입') {
       result.push({date, kind:'income', name, amount: Math.abs(amount), cat: mainCat, account});
     } else if (type === '지출') {
@@ -715,30 +330,21 @@ function parseXlsx(data) {
   return result;
 }
 
-// Drop zone
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
-
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f) loadFile(f);
-});
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f); });
 fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
 
 function loadFile(file) {
   const reader = new FileReader();
   reader.onload = e => {
     parsedRows = parseXlsx(new Uint8Array(e.target.result));
-    if (!parsedRows.length) { alert('거래내역을 찾지 못했어요. 뱅크샐러드에서 내보낸 파일인지 확인해주세요.'); return; }
+    if (!parsedRows.length) { alert('거래내역을 찾지 못했어요.'); return; }
     document.getElementById('file-name-text').textContent = `${file.name}  ·  ${parsedRows.length}건 파싱 완료`;
     document.getElementById('file-loaded').classList.remove('hidden');
-    renderStats();
-    renderPreview();
-    renderMapping();
+    renderStats(); renderPreview(); renderMapping();
     document.getElementById('step1').classList.add('done');
     document.getElementById('step2').classList.remove('hidden');
     document.getElementById('step2').classList.add('active');
@@ -757,20 +363,11 @@ function renderStats() {
 function renderPreview() {
   const tbody = document.getElementById('preview-body');
   tbody.innerHTML = '';
-  const show = parsedRows.slice(0, 60);
-  for (const r of show) {
+  for (const r of parsedRows.slice(0,60)) {
     const tr = document.createElement('tr');
-    const badge = r.kind === 'income'
-      ? `<span class="badge badge-income">수입</span>`
-      : `<span class="badge badge-expense">지출</span>`;
-    const sign = r.kind === 'expense' ? '-' : '+';
-    tr.innerHTML = `
-      <td>${r.date}</td>
-      <td>${badge}</td>
-      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.name}</td>
-      <td class="col-amount">${sign}${r.amount.toLocaleString()}원</td>
-      <td>${r.kind==='income' ? '<span class="text-muted">—</span>' : r.cat}</td>
-    `;
+    const badge = r.kind==='income' ? `<span class="badge badge-income">수입</span>` : `<span class="badge badge-expense">지출</span>`;
+    const sign = r.kind==='expense' ? '-' : '+';
+    tr.innerHTML = `<td>${r.date}</td><td>${badge}</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.name}</td><td class="col-amount">${sign}${r.amount.toLocaleString()}원</td><td>${r.kind==='income'?'<span class="text-muted">—</span>':r.cat}</td>`;
     tbody.appendChild(tr);
   }
   if (parsedRows.length > 60) {
@@ -783,64 +380,58 @@ function renderPreview() {
 function renderMapping() {
   const list = document.getElementById('map-list');
   list.innerHTML = '';
-  const cats = [...uniqueBankCats].sort();
-  for (const bc of cats) {
+  for (const bc of [...uniqueBankCats].sort()) {
     const div = document.createElement('div');
     div.className = 'map-item';
     const current = userMap[bc] || '기타';
-    const options = NOTION_CATEGORIES.map(nc =>
-      `<option value="${nc}" ${current===nc?'selected':''}>${nc}</option>`
-    ).join('');
-    div.innerHTML = `
-      <div class="map-from" title="${bc}">${bc}</div>
-      <div class="map-arrow">→</div>
-      <select class="map-select" data-from="${bc}" onchange="onMapChange(this)">${options}</select>
-    `;
+    const options = NOTION_CATEGORIES.map(nc => `<option value="${nc}" ${current===nc?'selected':''}>${nc}</option>`).join('');
+    div.innerHTML = `<div class="map-from" title="${bc}">${bc}</div><div class="map-arrow">→</div><select class="map-select" data-from="${bc}" onchange="onMapChange(this)">${options}</select>`;
     list.appendChild(div);
   }
 }
 
 function onMapChange(sel) {
   userMap[sel.dataset.from] = sel.value;
-  for (const r of parsedRows) {
-    if (r.kind === 'expense') r.cat = resolveCategory('', r.origCat);
-  }
+  for (const r of parsedRows) { if (r.kind==='expense') r.cat = resolveCategory('', r.origCat); }
   renderPreview();
 }
 
 function showTab(name) {
-  document.getElementById('tab-preview').classList.toggle('hidden', name !== 'preview');
-  document.getElementById('tab-mapping').classList.toggle('hidden', name !== 'mapping');
-  document.getElementById('tab-btn-preview').classList.toggle('active', name === 'preview');
-  document.getElementById('tab-btn-mapping').classList.toggle('active', name === 'mapping');
+  document.getElementById('tab-preview').classList.toggle('hidden', name!=='preview');
+  document.getElementById('tab-mapping').classList.toggle('hidden', name!=='mapping');
+  document.getElementById('tab-btn-preview').classList.toggle('active', name==='preview');
+  document.getElementById('tab-btn-mapping').classList.toggle('active', name==='mapping');
 }
 
 function activateStep3() {
-  document.getElementById('step2').classList.remove('active');
-  document.getElementById('step2').classList.add('done');
+  document.getElementById('step2').classList.replace('active','done');
   document.getElementById('step3').classList.remove('hidden');
   document.getElementById('step3').classList.add('active');
   document.getElementById('step3').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+async function notionFetch(token, path, method='GET', body=null) {
+  const url = `${PROXY_BASE}/${path}`;
+  const opts = {
+    method,
+    headers: { 'Authorization': 'Bearer ' + token, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if (!res.ok) { const e = await res.json(); throw new Error(e.message || res.status); }
+  return res.json();
 }
 
 async function testConnection() {
   const token = document.getElementById('notion-token').value.trim();
   const dbId  = document.getElementById('expense-db-id').value.trim().replace(/-/g,'');
   if (!token) { alert('토큰을 먼저 입력해주세요'); return; }
-
+  if (!dbId)  { alert('지출 DB ID를 먼저 입력해주세요'); return; }
   try {
-    const res = await fetch(`https://api.notion.com/v1/databases/${dbId}`, {
-      headers: { 'Authorization': 'Bearer ' + token, 'Notion-Version': '2022-06-28' }
-    });
-    if (res.ok) {
-      const d = await res.json();
-      alert(`✓ 연결 성공!\nDB 이름: ${d.title?.[0]?.plain_text || '(이름 없음)'}`);
-    } else {
-      const e = await res.json();
-      alert(`연결 실패: ${e.message || res.status}\n\n토큰과 DB ID를 확인하고, DB에 Integration 권한이 있는지 확인해주세요.`);
-    }
+    const d = await notionFetch(token, `databases/${dbId}`);
+    alert(`✓ 연결 성공!\nDB 이름: ${d.title?.[0]?.plain_text || '(이름 없음)'}`);
   } catch(e) {
-    alert('오류: ' + e.message);
+    alert(`연결 실패: ${e.message}\n\n토큰과 DB ID를 확인하고, DB에 Integration 권한이 있는지 확인해주세요.`);
   }
 }
 
@@ -854,106 +445,75 @@ function addLog(msg, type='muted') {
   box.scrollTop = box.scrollHeight;
 }
 
-async function notionCreate(token, dbId, props) {
-  const res = await fetch('https://api.notion.com/v1/pages', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json',
-      'Notion-Version': '2022-06-28'
-    },
-    body: JSON.stringify({ parent: { database_id: dbId }, properties: props })
-  });
-  if (!res.ok) {
-    const e = await res.json();
-    throw new Error(e.message || res.status);
-  }
-  return res.json();
-}
-
-function buildIncomeProps(row) {
-  return {
-    '이름': { title: [{ text: { content: row.name } }] },
-    '날짜': { date: { start: row.date } },
-    '금액': { number: row.amount },
-  };
-}
-
-function buildExpenseProps(row) {
-  return {
-    '이름': { title: [{ text: { content: row.name } }] },
-    '지출일': { date: { start: row.date } },
-    '금액': { number: row.amount },
-    '카테고리': { select: { name: row.cat } },
-  };
-}
-
 async function startUpload() {
   const token     = document.getElementById('notion-token').value.trim();
   const incomeDb  = document.getElementById('income-db-id').value.trim().replace(/-/g,'');
   const expenseDb = document.getElementById('expense-db-id').value.trim().replace(/-/g,'');
-
-  if (!token)     { alert('노션 토큰을 입력해주세요'); return; }
-  if (!incomeDb)  { alert('수입 DB ID를 입력해주세요'); return; }
-  if (!expenseDb) { alert('지출 DB ID를 입력해주세요'); return; }
+  if (!token || !incomeDb || !expenseDb) { alert('토큰과 DB ID를 모두 입력해주세요'); return; }
   if (!parsedRows.length) { alert('파일을 먼저 업로드해주세요'); return; }
 
   document.getElementById('upload-btn').disabled = true;
-  document.getElementById('step3').classList.remove('active');
-  document.getElementById('step3').classList.add('done');
+  document.getElementById('step3').classList.replace('active','done');
   document.getElementById('step4').classList.remove('hidden');
   document.getElementById('step4').classList.add('active');
   document.getElementById('step4').scrollIntoView({behavior:'smooth', block:'start'});
 
-  const incomeRows  = parsedRows.filter(r => r.kind === 'income');
-  const expenseRows = parsedRows.filter(r => r.kind === 'expense');
+  const incomeRows  = parsedRows.filter(r=>r.kind==='income');
+  const expenseRows = parsedRows.filter(r=>r.kind==='expense');
   const total = incomeRows.length + expenseRows.length;
   let done = 0, errors = 0;
 
   const updateProgress = () => {
-    const pct = Math.round(done / total * 100);
-    document.getElementById('progress-fill').style.width = pct + '%';
+    const pct = Math.round(done/total*100);
+    document.getElementById('progress-fill').style.width = pct+'%';
     document.getElementById('progress-text').textContent = `${done} / ${total}건 완료 (${pct}%)`;
   };
-
   updateProgress();
   addLog(`업로드 시작 — 수입 ${incomeRows.length}건, 지출 ${expenseRows.length}건`, 'info');
 
   for (const r of incomeRows) {
     try {
-      await notionCreate(token, incomeDb, buildIncomeProps(r));
+      await notionFetch(token, 'pages', 'POST', {
+        parent: { database_id: incomeDb },
+        properties: {
+          '이름': { title: [{ text: { content: r.name } }] },
+          '날짜': { date: { start: r.date } },
+          '금액': { number: r.amount },
+        }
+      });
       done++;
-      if (done % 5 === 0 || done === incomeRows.length) addLog(`수입 ${done}/${incomeRows.length}건 완료`, 'muted');
-    } catch(e) {
-      errors++;
-      addLog(`수입 오류 — ${r.name}: ${e.message}`, 'err');
-    }
+      if (done % 5 === 0) addLog(`수입 ${done}건 완료`, 'muted');
+    } catch(e) { errors++; addLog(`수입 오류 — ${r.name}: ${e.message}`, 'err'); }
     updateProgress();
-    await new Promise(res => setTimeout(res, 330));
+    await new Promise(res => setTimeout(res, 340));
   }
 
-  addLog(`지출 업로드 시작`, 'info');
+  addLog('지출 업로드 시작', 'info');
 
   for (const r of expenseRows) {
     try {
-      await notionCreate(token, expenseDb, buildExpenseProps(r));
+      await notionFetch(token, 'pages', 'POST', {
+        parent: { database_id: expenseDb },
+        properties: {
+          '이름': { title: [{ text: { content: r.name } }] },
+          '지출일': { date: { start: r.date } },
+          '금액': { number: r.amount },
+          '카테고리': { select: { name: r.cat } },
+        }
+      });
       done++;
-      if (done % 10 === 0 || done === total) addLog(`지출 ${done - incomeRows.length}/${expenseRows.length}건 완료`, 'muted');
-    } catch(e) {
-      errors++;
-      addLog(`지출 오류 — ${r.name}: ${e.message}`, 'err');
-    }
+      if (done % 10 === 0) addLog(`지출 ${done - incomeRows.length}건 완료`, 'muted');
+    } catch(e) { errors++; addLog(`지출 오류 — ${r.name}: ${e.message}`, 'err'); }
     updateProgress();
-    await new Promise(res => setTimeout(res, 330));
+    await new Promise(res => setTimeout(res, 340));
   }
 
   if (errors === 0) {
     addLog(`모두 완료! 총 ${done}건 업로드 성공.`, 'ok');
     document.getElementById('success-banner').classList.remove('hidden');
   } else {
-    addLog(`완료. ${done}건 성공, ${errors}건 실패.`, errors > 5 ? 'err' : 'info');
+    addLog(`완료. ${done}건 성공, ${errors}건 실패.`, errors>5?'err':'info');
   }
-
   document.getElementById('done-row').classList.remove('hidden');
 }
 </script>
