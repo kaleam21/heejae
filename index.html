@@ -586,15 +586,21 @@ function sendToNotion() {
       var prefix = r.type==="수입" ? "[수입] " : "[지출] ";
       return makeBullet(prefix+r.name+"  ["+r.cat+"]  "+(r.type==="수입"?"+":"-")+fmt(r.amount));
     });
+    if (children.length === 0) children = [makeBullet("-")];
     blocks.push({object:"block",type:"toggle",toggle:{rich_text:[makeText(curMonth+"월 "+day+"일  |  "+summary, true)],children:children}});
   });
 
   // 기존 블록 삭제 후 전송
   notionAPI(token, "blocks/"+PAGE_ID+"/children").then(function(existing) {
-    var deletePromises = (existing.results||[]).map(function(block) {
-      return notionAPI(token, "blocks/"+block.id, "DELETE");
+    var results = existing.results || [];
+    if (results.length === 0) return Promise.resolve();
+    var chain = Promise.resolve();
+    results.forEach(function(block) {
+      chain = chain.then(function() {
+        return fetch(PROXY+"/blocks/"+block.id, {method:"DELETE",headers:{"Authorization":"Bearer "+token,"Notion-Version":"2022-06-28","Content-Type":"application/json"}});
+      }).then(function() { return new Promise(function(r){setTimeout(r,150);}); });
     });
-    return Promise.all(deletePromises);
+    return chain;
   }).catch(function(){}).then(function() {
     setLog("블록 전송 중...");
     var chunks = [];
