@@ -141,6 +141,7 @@ tr:hover td{background:#FAFAFA}
       <button class="btn" onclick="document.getElementById('file-input2').click()">&#xC7AC;&#xC5C5;&#xB85C;&#xB4DC;</button>
       <input type="file" id="file-input2" accept=".xlsx,.xls" style="display:none"/>
       <button class="btn btn-notion" id="notion-btn" onclick="sendToNotion()">&#xB178;&#xC158;&#xC5D0; &#xC800;&#xC7A5;</button>
+      <button class="btn" id="template-btn" onclick="createTemplate()" style="background:#F0FDF4;color:#15803D;border-color:#86EFAC">&#xD15C;&#xD50C;&#xB9BF; &#xB9CC;&#xB4E4;&#xAE30;</button>
     </div>
   </div>
   <div class="token-bar">
@@ -195,6 +196,11 @@ tr:hover td{background:#FAFAFA}
 <script>
 var PROXY = window.location.origin + "/api/notion";
 var PAGE_ID = "344978aeeb1980a7ad59cc740dccc070";
+var DB_INCOME  = "df5978aeeb198244a16c81de12458e58";
+var DB_FIXED   = "eef978aeeb198227996e0183ac3444a4";
+var DB_EXPENSE = "ed9978aeeb198361907d0180536b5062";
+var DB_CAT     = "ab7978aeeb1982519cab01bb8142ab81";
+var catIdMap   = {};
 var CATS = ["식비","교통비","문화생활비","의류비","의료비","구독료","보험료","통신비","주거비","경조사비","저축과투자","기타"];
 var CAT_COLORS = ["#EF4444","#3B82F6","#8B5CF6","#F97316","#14B8A6","#F59E0B","#10B981","#06B6D4","#A855F7","#EC4899","#22C55E","#6B7280"];
 var DEFAULT_MAP = {
@@ -503,136 +509,213 @@ function notionAPI(token, path, method, body) {
   });
 }
 
-function sendToNotion() {
+async function loadCatIds(token) {
+  catIdMap = {};
+  var res = await notionAPI(token, "databases/"+DB_CAT+"/query", "POST", {page_size:100});
+  (res.results||[]).forEach(function(page) {
+    var props = page.properties || {};
+    var titleArr = (props["이름"]||{}).title || (props["Name"]||{}).title || [];
+    var name = (titleArr[0]||{}).plain_text || "";
+    if (name) catIdMap[name] = page.id;
+  });
+  setLog("카테고리 " + Object.keys(catIdMap).length + "개 로드 완료");
+}
+
+async function sendToNotion() {
   var token = document.getElementById("notion-token").value.trim();
   if (!token) { alert("노션 토큰을 입력해주세요"); return; }
   var btn = document.getElementById("notion-btn");
   btn.disabled = true; btn.textContent = "전송 중...";
-  setLog("노션 페이지 초기화 중...");
 
-  var rows = getRows(curYear, curMonth);
-  var inc = 0, exp = 0;
-  rows.forEach(function(r) { if (r.type==="수입") inc+=r.amount; else exp+=r.amount; });
-  var net = inc - exp;
+  try {
+    // 카테고리 ID 로드
+    setLog("카테고리 로딩 중...");
+    await loadCatIds(token);
 
-  var ct = {};
-  rows.filter(function(r){return r.type==="지출";}).forEach(function(r) { ct[r.cat]=(ct[r.cat]||0)+r.amount; });
-  var sortedCat = Object.entries(ct).sort(function(a,b){return b[1]-a[1];});
+    var rows = getRows(curYear, curMonth);
+    var incomeRows  = rows.filter(function(r) { return r.type === "수입"; });
+    var expenseRows = rows.filter(function(r) { return r.type === "지출"; });
+    var total = incomeRows.length + expenseRows.length;
+    var done = 0, errors = 0;
 
-  var nc = {}, na = {};
-  rows.filter(function(r){return r.type==="지출";}).forEach(function(r){nc[r.name]=(nc[r.name]||0)+1;na[r.name]=(na[r.name]||0)+r.amount;});
-  var top5 = Object.entries(nc).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
-
-  var dayMap = {};
-  rows.forEach(function(r) { var d=parseInt(r.date.split("-")[2]); if(!dayMap[d])dayMap[d]=[]; dayMap[d].push(r); });
-
-  function makeText(content, bold) {
-    var obj = {type:"text", text:{content:content}};
-    if (bold) obj.annotations = {bold:true};
-    return obj;
-  }
-
-  function makeHeading2(text) { return {object:"block",type:"heading_2",heading_2:{rich_text:[makeText(text)]}}; }
-  function makeDivider() { return {object:"block",type:"paragraph",paragraph:{rich_text:[{type:"text",text:{content:"─────────────────────────"}}]}}; }
-  function makeCallout(text, emoji, color) { return {object:"block",type:"callout",callout:{rich_text:[makeText(text)],icon:{emoji:emoji||"📌"},color:color||"blue_background"}}; }
-  function makeBullet(text, bold) { return {object:"block",type:"bulleted_list_item",bulleted_list_item:{rich_text:[makeText(text,bold)]}}; }
-
-  var blocks = [];
-
-  // 제목
-  blocks.push({object:"block",type:"heading_1",heading_1:{rich_text:[makeText(curYear+"년 "+curMonth+"월 가계부")]}});
-  blocks.push(makeDivider());
-
-  // 요약
-  blocks.push(makeHeading2("이달 요약"));
-  blocks.push({object:"block",type:"callout",callout:{rich_text:[makeText("지출  "+fmt(exp)+"   수입  "+fmt(inc)+"   순수입  "+(net>=0?"+":"")+fmt(net))],icon:{type:"emoji",emoji:"💰"},color:"blue_background"}});
-  blocks.push(makeDivider());
-
-  // 카테고리별 지출
-  blocks.push(makeHeading2("카테고리별 지출"));
-  if (sortedCat.length === 0) {
-    blocks.push(makeBullet("지출 내역 없음"));
-  } else {
-    sortedCat.forEach(function(pair) {
-      var cat=pair[0], val=pair[1];
-      var pct = exp > 0 ? Math.round(val/exp*100) : 0;
-      var barFilled = Math.round(pct/10);
-      var barStr = "";
-      for (var i=0; i<barFilled; i++) barStr += "|";
-      for (var i=barFilled; i<10; i++) barStr += "-";
-      blocks.push(makeBullet(cat+"  "+fmt(val)+"  ("+pct+"%  "+barStr+")"));
-    });
-  }
-  blocks.push(makeDivider());
-
-  // Top5
-  blocks.push(makeHeading2("거래 횟수 Top 5"));
-  top5.forEach(function(pair, i) {
-    var name=pair[0], cnt=pair[1];
-    blocks.push(makeBullet((i+1)+"위  "+name+"  -  "+cnt+"회  /  "+fmt(na[name]), i===0));
-  });
-  blocks.push(makeDivider());
-
-  // 일별 거래내역
-  blocks.push(makeHeading2("일별 거래내역"));
-  var sortedDays = Object.keys(dayMap).map(Number).sort(function(a,b){return b-a;});
-  sortedDays.forEach(function(day) {
-    var dr = dayMap[day];
-    var dayExp=0, dayInc=0;
-    dr.forEach(function(r){if(r.type==="지출")dayExp+=r.amount;else dayInc+=r.amount;});
-    var summary = "";
-    if (dayExp>0) summary += "지출 "+fmt(dayExp);
-    if (dayInc>0) summary += (summary?" / ":"") + "수입 "+fmt(dayInc);
-    // 토글 대신 heading3 + 불릿으로 구성 (API children 제한 우회)
-    blocks.push({object:"block",type:"heading_3",heading_3:{rich_text:[makeText(curMonth+"월 "+day+"일  |  "+summary, true)]}});
-    dr.slice().sort(function(a,b){return b.amount-a.amount;}).forEach(function(r) {
-      var prefix = r.type==="수입" ? "[수입] " : "[지출] ";
-      blocks.push(makeBullet(prefix+r.name+"  ["+r.cat+"]  "+(r.type==="수입"?"+":"-")+fmt(r.amount)));
-    });
-
-  });
-
-  // blocks 검증 - children 있는 블록은 비어있으면 안됨
-  blocks = blocks.filter(function(b) {
-    if (b.type === "toggle" && (!b.toggle.children || b.toggle.children.length === 0)) return false;
-    if (b.type === "table" && (!b.table.children || b.table.children.length === 0)) return false;
-    return true;
-  });
-
-  // 기존 블록 삭제 후 전송
-  notionAPI(token, "blocks/"+PAGE_ID+"/children").then(function(existing) {
-    var results = existing.results || [];
-    if (results.length === 0) return Promise.resolve();
-    var chain = Promise.resolve();
-    results.forEach(function(block) {
-      chain = chain.then(function() {
-        return fetch(PROXY+"/blocks/"+block.id, {method:"DELETE",headers:{"Authorization":"Bearer "+token,"Notion-Version":"2022-06-28","Content-Type":"application/json"}});
-      }).then(function() { return new Promise(function(r){setTimeout(r,150);}); });
-    });
-    return chain;
-  }).catch(function(){}).then(function() {
-    setLog("블록 전송 중...");
-    var chunks = [];
-    for (var i=0; i<blocks.length; i+=20) chunks.push(blocks.slice(i,i+20));
-    var idx = 0;
-    function sendChunk() {
-      if (idx >= chunks.length) {
-        setLog("노션 저장 완료!", "#10B981");
-        btn.disabled=false; btn.textContent="노션에 저장";
-        return;
-      }
-      setLog("전송 중... "+Math.min((idx+1)*80, blocks.length)+"/"+blocks.length);
-      notionAPI(token, "blocks/"+PAGE_ID+"/children", "PATCH", {children:chunks[idx]}).then(function() {
-        idx++;
-        setTimeout(sendChunk, 300);
-      }).catch(function(e) {
-        console.log("오류 발생 청크:", JSON.stringify(chunks[idx]));
-        setLog("오류: "+e.message, "#EF4444");
-        btn.disabled=false; btn.textContent="노션에 저장";
-      });
+    function updateLog() {
+      setLog("전송 중... " + done + "/" + total + "건 완료");
     }
-    sendChunk();
-  });
+
+    // 수입 전송
+    setLog("수입 " + incomeRows.length + "건 전송 중...");
+    for (var i = 0; i < incomeRows.length; i++) {
+      var r = incomeRows[i];
+      try {
+        await notionAPI(token, "pages", "POST", {
+          parent: {database_id: DB_INCOME},
+          properties: {
+            "이름": {title: [{type:"text", text:{content: r.name}}]},
+            "날짜": {date: {start: r.date}},
+            "금액": {number: r.amount}
+          }
+        });
+        done++;
+      } catch(e) {
+        errors++;
+        console.log("수입 오류:", r.name, e.message);
+      }
+      updateLog();
+      await new Promise(function(res){setTimeout(res,350);});
+    }
+
+    // 지출(변동비) 전송
+    setLog("지출 " + expenseRows.length + "건 전송 중...");
+    for (var i = 0; i < expenseRows.length; i++) {
+      var r = expenseRows[i];
+      var props = {
+        "이름": {title: [{type:"text", text:{content: r.name}}]},
+        "지출일": {date: {start: r.date}},
+        "금액": {number: r.amount}
+      };
+      var catId = catIdMap[r.cat];
+      if (catId) props["카테고리"] = {relation: [{id: catId}]};
+      try {
+        await notionAPI(token, "pages", "POST", {
+          parent: {database_id: DB_EXPENSE},
+          properties: props
+        });
+        done++;
+      } catch(e) {
+        errors++;
+        console.log("지출 오류:", r.name, e.message);
+      }
+      updateLog();
+      await new Promise(function(res){setTimeout(res,350);});
+    }
+
+    if (errors === 0) {
+      setLog("완료! 총 " + done + "건 노션에 저장됐어요.", "#10B981");
+    } else {
+      setLog("완료. " + done + "건 성공, " + errors + "건 실패.", "#F59E0B");
+    }
+  } catch(e) {
+    setLog("오류: " + e.message, "#EF4444");
+  }
+  btn.disabled = false; btn.textContent = "노션에 저장";
+}
+
+async function createTemplate() {
+  var token = document.getElementById("notion-token").value.trim();
+  if (!token) { alert("노션 토큰을 먼저 입력해주세요"); return; }
+  var btn = document.getElementById("template-btn");
+  btn.disabled = true; btn.textContent = "생성 중...";
+  setLog("가계부 템플릿 생성 중...");
+
+  try {
+    // 1. 카테고리 DB 생성
+    setLog("카테고리 DB 생성 중...");
+    var catDbRes = await notionAPI(token, "databases", "POST", {
+      parent: {type:"page_id", page_id: PAGE_ID},
+      title: [{type:"text", text:{content:"카테고리"}}],
+      properties: {
+        "이름": {title:{}},
+        "총 지출 대비 비율": {rich_text:{}}
+      }
+    });
+    var catDbId = catDbRes.id;
+    setLog("카테고리 DB 생성 완료. 항목 입력 중...");
+
+    // 2. 카테고리 12개 입력
+    var cats = [
+      {name:"식비", icon:"🍜"},
+      {name:"교통비", icon:"🚌"},
+      {name:"문화생활비", icon:"🎭"},
+      {name:"의류비", icon:"👗"},
+      {name:"의료비", icon:"💊"},
+      {name:"구독료", icon:"▶️"},
+      {name:"보험료", icon:"🛡️"},
+      {name:"통신비", icon:"📱"},
+      {name:"주거비", icon:"🏠"},
+      {name:"경조사비", icon:"🎁"},
+      {name:"저축과투자", icon:"💰"},
+      {name:"기타", icon:"···"}
+    ];
+    for (var i=0; i<cats.length; i++) {
+      await notionAPI(token, "pages", "POST", {
+        parent: {database_id: catDbId},
+        icon: {type:"emoji", emoji: cats[i].icon},
+        properties: {
+          "이름": {title:[{type:"text", text:{content: cats[i].name}}]}
+        }
+      });
+      await new Promise(function(r){setTimeout(r,200);});
+    }
+    setLog("카테고리 12개 입력 완료.");
+
+    // 3. 지출(변동비) DB 생성
+    setLog("지출 DB 생성 중...");
+    var expDbRes = await notionAPI(token, "databases", "POST", {
+      parent: {type:"page_id", page_id: PAGE_ID},
+      title: [{type:"text", text:{content:"지출(변동비)"}}],
+      icon: {type:"emoji", emoji:"📤"},
+      properties: {
+        "이름": {title:{}},
+        "지출일": {date:{}},
+        "금액": {number:{format:"won"}},
+        "카테고리": {relation:{database_id: catDbId, single_property:{}}},
+        "브랜드 or 업체": {rich_text:{}},
+        "계좌": {rich_text:{}}
+      }
+    });
+    var expDbId = expDbRes.id;
+    setLog("지출 DB 생성 완료.");
+
+    // 4. 수입 DB 생성
+    setLog("수입 DB 생성 중...");
+    var incDbRes = await notionAPI(token, "databases", "POST", {
+      parent: {type:"page_id", page_id: PAGE_ID},
+      title: [{type:"text", text:{content:"수입"}}],
+      icon: {type:"emoji", emoji:"📥"},
+      properties: {
+        "이름": {title:{}},
+        "날짜": {date:{}},
+        "금액": {number:{format:"won"}},
+        "종류": {select:{options:[
+          {name:"주수입", color:"blue"},
+          {name:"부수입", color:"green"},
+          {name:"기타", color:"gray"}
+        ]}}
+      }
+    });
+    var incDbId = incDbRes.id;
+    setLog("수입 DB 생성 완료.");
+
+    // 5. 페이지에 안내 블록 추가
+    await notionAPI(token, "blocks/"+PAGE_ID+"/children", "PATCH", {
+      children: [
+        {object:"block",type:"callout",callout:{
+          rich_text:[{type:"text",text:{content:"가계부 템플릿이 생성됐어요! 아래 DB ID를 웹앱에 입력하세요."}}],
+          icon:{type:"emoji",emoji:"✅"},
+          color:"green_background"
+        }},
+        {object:"block",type:"bulleted_list_item",bulleted_list_item:{
+          rich_text:[{type:"text",text:{content:"지출 DB ID: "+expDbId.replace(/-/g,"")}}]
+        }},
+        {object:"block",type:"bulleted_list_item",bulleted_list_item:{
+          rich_text:[{type:"text",text:{content:"수입 DB ID: "+incDbId.replace(/-/g,"")}}]
+        }}
+      ]
+    });
+
+    // 6. 웹앱 DB ID 자동 입력
+    document.getElementById("income-db-id") && (document.getElementById("income-db-id").value = incDbId.replace(/-/g,""));
+    document.getElementById("expense-db-id") && (document.getElementById("expense-db-id").value = expDbId.replace(/-/g,""));
+
+    setLog("템플릿 생성 완료! 노션 페이지를 확인해보세요.", "#10B981");
+    alert("가계부 템플릿이 생성됐어요!\n\n지출 DB ID: "+expDbId.replace(/-/g,"")+"\n수입 DB ID: "+incDbId.replace(/-/g,"")+"\n\n이 ID들을 웹앱 노션 연동칸에 입력하세요.");
+    btn.disabled = false; btn.textContent = "템플릿 만들기";
+
+  } catch(e) {
+    setLog("오류: "+e.message, "#EF4444");
+    alert("오류: "+e.message);
+    btn.disabled = false; btn.textContent = "템플릿 만들기";
+  }
 }
 </script>
 </body>
