@@ -622,29 +622,15 @@ async function createTemplate() {
     setLog("카테고리 DB 생성 완료. 항목 입력 중...");
 
     // 2. 카테고리 12개 입력
-    var cats = [
-      {name:"식비", icon:"🍜"},
-      {name:"교통비", icon:"🚌"},
-      {name:"문화생활비", icon:"🎭"},
-      {name:"의류비", icon:"👗"},
-      {name:"의료비", icon:"💊"},
-      {name:"구독료", icon:"▶️"},
-      {name:"보험료", icon:"🛡️"},
-      {name:"통신비", icon:"📱"},
-      {name:"주거비", icon:"🏠"},
-      {name:"경조사비", icon:"🎁"},
-      {name:"저축과투자", icon:"💰"},
-      {name:"기타", icon:"···"}
-    ];
+    var cats = ["식비","교통비","문화생활비","의류비","의료비","구독료","보험료","통신비","주거비","경조사비","저축과투자","기타"];
     for (var i=0; i<cats.length; i++) {
       await notionAPI(token, "pages", "POST", {
         parent: {database_id: catDbId},
-        icon: {type:"emoji", emoji: cats[i].icon},
         properties: {
-          "이름": {title:[{type:"text", text:{content: cats[i].name}}]}
+          "이름": {title:[{type:"text", text:{content: cats[i]}}]}
         }
       });
-      await new Promise(function(r){setTimeout(r,200);});
+      await new Promise(function(r){setTimeout(r,250);});
     }
     setLog("카테고리 12개 입력 완료.");
 
